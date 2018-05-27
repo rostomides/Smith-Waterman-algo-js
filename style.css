@@ -1,0 +1,56 @@
+p {
+    color: red;
+}
+#scores{
+    table-layout: fixed;
+}
+td{
+    width: 60px;
+    height: 30px;
+    text-align: center;
+}
+
+.diagonal{
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+    height: 100%;
+    width :100%;
+    font-size: 55%
+}
+.horizontal{    
+    text-align: center;   
+    border-right: 2px solid;
+    padding-top: 30%;
+    height: 100%;
+    width :100%; 
+    font-size: 55% ; 
+   
+}
+.vertical{  
+    border-bottom: 2px solid;
+    height: 100%;
+    width :100%; 
+    font-size: 55%;    
+}
+/* Organize the td area */
+.diagonal { grid-area: diagonal; }
+.horizontal { grid-area: horizontal; }
+.vertical { grid-area: vertical; }
+.score { grid-area: score; }
+
+
+.cell{ 
+    border: 2px solid;  
+    margin: 0px; 
+    display: grid;     
+    grid-template-areas:
+    'diagonal vertical vertical vertical'
+    'diagonal vertical vertical vertical'    
+    'horizontal score score score'  
+    'horizontal score score score'
+    'horizontal score score score'  
+    'horizontal score score score';    
+    grid-gap:0px;    
+    padding: 0px;   
+    overflow: hidden;
+}
