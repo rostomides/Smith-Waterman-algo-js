@@ -11,15 +11,9 @@ This is my own implementation of the Smith-Waterman for The web use. The core al
 */
 
 window.onload = function () {
-    let gap = -2,
-        match = 1,
-        miss = -1;
 
-
+    // Load penality table
     initializePenaltyTable('penalty-table');
-
-
-
 
     // Clear the grid and the input fields for new alignment
     document.getElementById("newAlignButton").addEventListener('click', function () {
@@ -28,28 +22,13 @@ window.onload = function () {
         let seq2 = document.getElementById("seq2").value = "";
     });
 
-
-
     // Change the scoring of the detailed table based on global scores
     let elmt = document.querySelectorAll("#penalty-global input");
     elmt.forEach(function (item) {
-        item.addEventListener("blur", function () {
-            // let type = null;
-            // if (item.id == "match-score") {
-            //     type = "match";
-            // } else if (item.id == "mismatch-score") {
-            //     type = "mismatch";
-            // } else if (item.id == "gap-score") {
-            //     type = "gap";
-            // }
-
+        item.addEventListener("change", function () {
             changePenalityScoreDetailedTableFromGlobalScores();
         })
-    })
-
-
-
-
+    });
 
 
 }
