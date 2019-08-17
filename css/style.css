@@ -1,6 +1,13 @@
-p {
-    color: red;
+
+/* Remove spinners from the input number */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
+
+
+
 #scores{
     table-layout: fixed;
 }
