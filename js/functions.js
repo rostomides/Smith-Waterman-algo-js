@@ -2,25 +2,28 @@
 // Classes
 //------------------------------------------------ 
 // The class cell contains the information about every cell in the grid
-class Cell {
-    constructor(
-        seq1Index, // Index of the nucleotide in the first sequence
-        seq2Index, // Index of the nucleotide in the second sequence
-        prevHorz,  // score of the cell at the left
-        prevVert,  // score of the cell at the top
-        prevDiag,  // score of the cell at the diagonal
-        score,     // score of the current cell
-        nucleotides //nucleotide in the current cell
-    ) {
-        this.seq1Index = seq1Index;
-        this.seq2Index = seq2Index;
-        this.prevDiag = prevDiag;
-        this.prevHorz = prevHorz;
-        this.prevVert = prevVert;
-        this.score = score;
-        this.nucleotides = nucleotides;
-    }
-}
+// class Cell {
+//     constructor(
+//         seq1Index, // Index of the nucleotide in the first sequence
+//         seq2Index, // Index of the nucleotide in the second sequence
+//         prevHorz,  // score of the cell at the left
+//         prevVert,  // score of the cell at the top
+//         prevDiag,  // score of the cell at the diagonal
+//         score,     // score of the current cell
+//         nucleotides //nucleotide in the current cell
+//     ) {
+//         this.seq1Index = seq1Index;
+//         this.seq2Index = seq2Index;
+//         this.prevDiag = prevDiag;
+//         this.prevHorz = prevHorz;
+//         this.prevVert = prevVert;
+//         this.score = score;
+//         this.nucleotides = nucleotides;
+//     }
+// } 
+
+
+
 
 // ------------------------------------------------
 // functions
@@ -60,6 +63,7 @@ function initializePenaltyTable(container_id) {
 
         // Fill the rest of the table with input fields that will be modified
         for (let j = 0; j < nucleotides.length; j++) {
+            // Fill the first half of the table (below diagonal) with functional cells
             if (j <= i) {
                 let td = document.createElement("td");
                 let input = document.createElement("input");
@@ -81,6 +85,7 @@ function initializePenaltyTable(container_id) {
                 td.appendChild(input);
                 tr.appendChild(td)
             } else {
+                // Fill the second half with placeholder cells
                 let td = document.createElement("td");
                 td.classList.add("bg-muted");
                 let input = document.createElement("input");
@@ -113,36 +118,36 @@ function changePenalityScoreDetailedTable(current_elm) {
 }
 
 
-function changePenalityScoreDetailedTableFromGlobalScores(type, score) {
+// function changePenalityScoreDetailedTableFromGlobalScores(type, score) {
 
-    let match_value = document.getElementById("match-score").value;
-    let mismatch_value = document.getElementById("mismatch-score").value;
-    let gap_value = document.getElementById("gap-score").value;
+//     let match_value = document.getElementById("match-score").value;
+//     let mismatch_value = document.getElementById("mismatch-score").value;
+//     let gap_value = document.getElementById("gap-score").value;
 
-    let penalties = document.querySelectorAll(".penalty");
+//     let penalties = document.querySelectorAll(".penalty");
 
-    penalties.forEach(function (item) {
-        let id = item.id.split("__");
+//     penalties.forEach(function (item) {
+//         let id = item.id.split("__");
 
-        if (id[0] == "-" || id[1] == "-" || (id[0] == "-" && id[1] == "-")) {
-            item.setAttribute('value', gap_value);
-        }
-        else if (id[0] == id[1]) {
-            item.setAttribute('value', match_value);
-        }
-        else if (id[0] != id[1]) {
-            item.setAttribute('value', mismatch_value);
-        }
-    });
-}
-
-
-
+//         if (id[0] == "-" || id[1] == "-" || (id[0] == "-" && id[1] == "-")) {
+//             item.setAttribute('value', gap_value);
+//         }
+//         else if (id[0] == id[1]) {
+//             item.setAttribute('value', match_value);
+//         }
+//         else if (id[0] != id[1]) {
+//             item.setAttribute('value', mismatch_value);
+//         }
+//     });
+// }
 
 
 function generate2dGrid(seq1, seq2) {
-
-    // Generate a 2d array filled with zeros. The number of columns correspond to the length of seq2, and the number of lines corresponds to the length of seq2
+    // Generate a 2d array filled with zeros. 
+    // The number of columns correspond to the length of seq2, and the number of lines corresponds to the length of seq2
+    // Before filling the 2d array, add - to the start of both sequences
+    seq1 = "-" + seq1;
+    seq2 = "-" + seq2;
 
     let scoreMat = [];
     //Build the score grid
@@ -152,3 +157,74 @@ function generate2dGrid(seq1, seq2) {
     }
     return scoreMat
 }
+
+
+
+
+// Cell class will contain all the information for each cell in the table
+class Cell {
+        constructor (
+            value= null, 
+            comesFrom=null,
+            horizScore=null,
+            vertScore=null,
+            diagScore=null
+        ){
+            this.value = value;
+            this.comesFrom = comesFrom;
+            this.horizScore = horizScore;
+            this.vertScore = vertScore;
+            this.diagScore = diagScore;            
+        }
+    }
+ 
+function initializeFirstRowAndFirstColumn(seq1, seq2, scoreMat){ 
+
+    // initialize the value of the cell[0][0]
+    let cell00 = new Cell();
+    cell00.value = 0;
+    scoreMat[0][0] = cell00;
+
+    // filling the column line
+    for(let i=0; i<seq1.length; i++){   
+        // Select the penalty  
+        let penalty = document.querySelector("#" +  seq1[i] + "__-").value;
+        // Create the cell
+        let cell = new Cell();
+        cell.value = parseInt(scoreMat[i][0].value) + parseInt(penalty);
+        cell.comesFrom = i + "-" + 0;
+        cell.vertScore = parseInt(scoreMat[i][0].value) + parseInt(penalty);;
+        scoreMat[i+1][0] = cell;
+    }
+
+    // filling first row
+    for(let i=0; i<seq2.length; i++){  
+        // Select the penalty       
+        let penalty = document.querySelector("#" +  seq2[i] + "__-").value;
+
+        let cell = new Cell();
+        cell.value = parseInt(scoreMat[0][i].value) + parseInt(penalty);
+        cell.comesFrom = 0 + "-" + i;
+        cell.horizScore = parseInt(scoreMat[0][i].value) + parseInt(penalty);;
+        scoreMat[0][i+1] = cell;
+        
+        
+    }
+
+    return(scoreMat);
+
+
+
+
+}
+
+
+
+
+function generateAlignmentGrid(seq1, seq2){
+
+}
+
+
+
+
