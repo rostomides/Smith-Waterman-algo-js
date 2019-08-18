@@ -11,7 +11,7 @@ This is my own implementation of the Smith-Waterman for The web use. The core al
 */
 
 window.onload = function () {
-    let gap = -2,
+    let gap = -2, 
         match = 1,
         miss = -1;
 

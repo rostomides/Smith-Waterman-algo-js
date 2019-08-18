@@ -46,10 +46,17 @@ window.onload = function () {
             document.getElementById("errors").innerText = "Please provide correct succession of nucleotides (ACGT)";
         } else {
             // Initialize empty matrix
-            let scoreMat = generate2dGrid(seq1, seq2);
+            let score_mat = generate2dGrid(seq1, seq2);
 
             // Initialize first row and first column
-            scoreMat = initializeFirstRowAndFirstColumn(seq1, seq2, scoreMat);            
+            score_mat = initializeFirstRowAndFirstColumn(seq1, seq2, score_mat);
+
+            // Calculate the rest of the table values
+            score_mat = calculateDistance(seq1, seq2, score_mat)
+            
+            // Create the html grid
+            let distancesTab = document.querySelector('#distance-table');
+            createVisalGrid(seq1, seq2, score_mat, distancesTab);
         }
     });
 

@@ -8,8 +8,8 @@ input[type=number]::-webkit-outer-spin-button {
 
 
 
-#scores{
-    table-layout: fixed;
+#distance-table{
+    table-layout: fixed; 
 }
 td{
     width: 60px;
