@@ -168,15 +168,20 @@ class Cell {
             comesFrom=null,
             horizScore=null,
             vertScore=null,
-            diagScore=null,            
+            diagScore=null, 
+            position=null,           
         ){
             this.value = value;
             this.comesFrom = comesFrom;
             this.horizScore = horizScore;
             this.vertScore = vertScore;
-            this.diagScore = diagScore;   
+            this.diagScore = diagScore;  
+            this.position = position; 
+             
         }
     }
+
+
  
 function initializeFirstRowAndFirstColumn(seq1, seq2, score_mat){ 
 
@@ -184,6 +189,7 @@ function initializeFirstRowAndFirstColumn(seq1, seq2, score_mat){
     let cell00 = new Cell();
     cell00.value = 0;    
     score_mat[0][0] = cell00;
+    allPaths.push({'key': 0 + "-" + 0, 'parent':'none'});
 
 
     // filling the column line
@@ -196,6 +202,9 @@ function initializeFirstRowAndFirstColumn(seq1, seq2, score_mat){
         cell.comesFrom = i + "-" + 0;
         cell.vertScore = parseInt(score_mat[i][0].value) + parseInt(penalty);        
         score_mat[i+1][0] = cell;
+
+        allPaths.push({'key': (i+1) + "-" + 0, 'parent': i + "-" + 0});
+
     }
 
     // filling first row
@@ -208,6 +217,7 @@ function initializeFirstRowAndFirstColumn(seq1, seq2, score_mat){
         cell.comesFrom = 0 + "-" + i;
         cell.horizScore = parseInt(score_mat[0][i].value) + parseInt(penalty);;
         score_mat[0][i+1] = cell; 
+        allPaths.push({'key': 0 + "-" + (i+1), 'parent': 0 + "-" + i});
     }
     return(score_mat);
 }
@@ -246,10 +256,15 @@ function calculateDistance(seq1, seq2, score_mat){
 
             if(minimum === horiz_val){
                 cell.comesFrom = i + "-" + (j-1);
-            }else if (minimum === vert_val){
+                allPaths.push({'key': i + "-" + j, 'parent': i + "-" + (j-1)});
+            }
+            if (minimum === vert_val){
                 cell.comesFrom = (i-1) + "-" + j;
-            }else if (minimum === diag_val){
+                allPaths.push({'key': i + "-" + j, 'parent': (i-1) + "-" + j});
+            }
+            if (minimum === diag_val){
                 cell.comesFrom = (i-1) + "-" + (j-1);
+                allPaths.push({'key': i + "-" + j, 'parent': (i-1) + "-" + (j-1)});
             }
             cell.value = minimum;
             score_mat[i][j] = cell;
@@ -314,6 +329,7 @@ function createVisalGrid(seq1, seq2, score_mat, container){
 
             let score = document.createElement("div");
             score.classList.add("score");
+            score.setAttribute('id', "grid__" + i + "__" + j)
             
             //Append the elements to td
             div.appendChild(diag);
@@ -341,10 +357,12 @@ function createVisalGrid(seq1, seq2, score_mat, container){
             scorep.innerText = score_mat[i][j].value;
             score.appendChild(scorep);            
         }
-        container.appendChild(tr);
-        
+        container.appendChild(tr);        
     }
+
+
     
+            
 
 }
 
