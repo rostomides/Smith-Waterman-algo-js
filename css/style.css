@@ -11,9 +11,10 @@ input[type=number]::-webkit-outer-spin-button {
 #distance-table{
     table-layout: fixed; 
 }
+
 td{
-    width: 60px;
-    height: 30px;
+    width: 7rem;
+    height: 1.5rem;
     text-align: center;
 }
 
@@ -60,4 +61,15 @@ td{
     grid-gap:0px;    
     padding: 0px;   
     overflow: hidden;
+}
+
+
+
+
+.information-formula{
+    height: 5rem;
+    width: 5rem;
+    background-color: red;
+    /* position: fixed;     */
+    position:fixed;
 }
