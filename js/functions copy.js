@@ -67,6 +67,25 @@ function initializePenaltyTable(container_id) {
     }
 }
 
+
+// function changePenalityScoreDetailedTable(current_elm) {
+//     // Change the penality score of the corresponding cell in the left or the right of the diagnal    
+//     let current_value = current_elm.value;
+
+//     let current_id = current_elm.id;
+//     console.log(current_id);
+
+//     let nucleotides = current_id.split("__");
+//     let rcell_id = nucleotides[1] + "__" + nucleotides[0];
+//     console.log(rcell_id);
+
+//     document.getElementById(rcell_id).setAttribute("value", "")
+//     document.getElementById(rcell_id).setAttribute("value", current_value);
+//     document.getElementById(current_id).setAttribute("value", current_value);
+
+// }
+
+
 function changePenalityScoreDetailedTableFromGlobalScores(type, score) {
 
     let match_value = document.getElementById("match-score").value;
@@ -114,18 +133,14 @@ function generate2dGrid(seq1, seq2) {
 class Cell {
         constructor (
             value= null, 
-            comesFromHorz=null,
-            comesFromVert=null,
-            comesFromDiag=null,
+            comesFrom=null,
             horizScore=null,
             vertScore=null,
             diagScore=null, 
             position=null,           
         ){
             this.value = value;
-            this.comesFromHorz = comesFromHorz;
-            this.comesFromDiag = comesFromDiag;
-            this.comesFromVert = comesFromVert;
+            this.comesFrom = comesFrom;
             this.horizScore = horizScore;
             this.vertScore = vertScore;
             this.diagScore = diagScore;  
@@ -137,115 +152,41 @@ class Cell {
  
 function initializeFirstRowAndFirstColumn(seq1, seq2, score_mat){ 
 
-    seq1 = "-" + seq1;
-    seq2 = "-" + seq2;
-
     // initialize the value of the cell[0][0]
     let cell00 = new Cell();
-    cell00.value = 0; 
-    cell00.position = "0__0";
-    score_mat[0][0] = cell00;   
+    cell00.value = 0;    
+    score_mat[0][0] = cell00;
+    allPaths.push({'key': 0 + "-" + 0, 'parent':'none'});
 
     // filling the column line
-    for(let i=1; i<seq1.length; i++){   
+    for(let i=0; i<seq1.length; i++){   
         // Select the penalty  
         let penalty = document.querySelector("#" +  seq1[i] + "__-").value;
         // Create the cell
         let cell = new Cell();
-        cell.value = parseInt(score_mat[i-1][0].value) + parseInt(penalty);
-        cell.comesFromVert = score_mat[i-1][0];
-        cell.position = i + "__" + 0;        
-        cell.vertScore = parseInt(score_mat[i-1][0].value) + parseInt(penalty);        
-        score_mat[i][0] = cell;  
+        cell.value = parseInt(score_mat[i][0].value) + parseInt(penalty);
+        cell.comesFrom = i + "-" + 0;
+        cell.vertScore = parseInt(score_mat[i][0].value) + parseInt(penalty);        
+        score_mat[i+1][0] = cell;
+
+        allPaths.push({'key': (i+1) + "-" + 0, 'parent': i + "-" + 0});
+
     }
 
     // filling first row
-    for(let i=1; i<seq2.length; i++){  
+    for(let i=0; i<seq2.length; i++){  
         // Select the penalty       
         let penalty = document.querySelector("#" +  seq2[i] + "__-").value;
 
         let cell = new Cell();
-        cell.value = parseInt(score_mat[0][i-1].value) + parseInt(penalty);
-        cell.comesFromHorz = score_mat[0][i-1];
-        cell.position = 0 + "__" + i        
-        cell.horizScore = parseInt(score_mat[0][i-1].value) + parseInt(penalty);;
-        score_mat[0][i] = cell; 
-        
+        cell.value = parseInt(score_mat[0][i].value) + parseInt(penalty);
+        cell.comesFrom = 0 + "-" + i;
+        cell.horizScore = parseInt(score_mat[0][i].value) + parseInt(penalty);;
+        score_mat[0][i+1] = cell; 
+        allPaths.push({'key': 0 + "-" + (i+1), 'parent': 0 + "-" + i});
     }
     return(score_mat);
 }
-
-
-
-
-function getPaths(score_mat){ 
-    let seq1 = document.querySelector("#seq1").value.toUpperCase();
-    let seq2 = document.querySelector("#seq2").value.toUpperCase();
-
-    var result = []
-
-
-
-
-    console.log(score_mat[seq1.length-1][seq2.length-1])
-
-    allPaths = searchPaths(score_mat[seq1.length][seq2.length], score_mat, stringPath='', allPaths=[])
-
-    
-     
-}
-var pppp = [];
-function searchPaths(cell, score_mat, stringPath='', allPaths=[]){
-    if (cell.comesFromVert == null && cell.comesFromDiag == null && cell.comesFromVert == null){
-        stringPath = stringPath + "->" + cell.position;
-        
-        // allPaths.push(stringPath);
-
-        pppp.push(stringPath)
-        return  
-    }
-
-    else{
-        stringPath = stringPath + "->" + cell.position;
-        
-        if(cell.comesFromVert != null){
-            let prev_cell = cell.comesFromVert.position.split("__");
-            
-            searchPaths(score_mat[prev_cell[0]][prev_cell[1]], score_mat, stringPath, allPaths);
-        }
-        if(cell.comesFromDiag != null){
-            let prev_cell = cell.comesFromDiag.position.split("__");
-            searchPaths(score_mat[prev_cell[0]][prev_cell[1]], score_mat, stringPath, allPaths);
-        }
-        if(cell.comesFromHorz != null){
-            let prev_cell = cell.comesFromHorz.position.split("__");
-            searchPaths(score_mat[prev_cell[0]][prev_cell[1]], score_mat, stringPath, allPaths);
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function calculateDistance(seq1, seq2, score_mat){
@@ -280,16 +221,18 @@ function calculateDistance(seq1, seq2, score_mat){
             let minimum = Math.min(horiz_val, vert_val, diag_val);
 
             if(minimum === horiz_val){
-                cell.comesFromHorz = score_mat[i][j-1];                
+                cell.comesFrom = i + "-" + (j-1);
+                allPaths.push({'key': i + "-" + j, 'parent': i + "-" + (j-1)});
             }
             if (minimum === vert_val){
-                cell.comesFromVert = score_mat[i-1][j];                
+                cell.comesFrom = (i-1) + "-" + j;
+                allPaths.push({'key': i + "-" + j, 'parent': (i-1) + "-" + j});
             }
             if (minimum === diag_val){
-                cell.comesFromDiag = score_mat[i-1][j-1];                
+                cell.comesFrom = (i-1) + "-" + (j-1);
+                allPaths.push({'key': i + "-" + j, 'parent': (i-1) + "-" + (j-1)});
             }
             cell.value = minimum;
-            cell.position = i + "__" +j;
             score_mat[i][j] = cell;
         }    
     }
@@ -353,38 +296,38 @@ function createVisalGrid(seq1, seq2, score_mat, container){
             let score = document.createElement("div");
             score.classList.add("score");
             score.setAttribute('id', "grid__" + i + "__" + j)
+
+            // add event listener to score
+            score.addEventListener('click', function(e){
+                let score = e.target
 // ----------------------------------------------------------------------------------------
-            // // add event listener to score
-            // score.addEventListener('click', function(e){
-            //     let score = e.target
-
-            //     try{
-            //          document.querySelectorAll('.information-formula').forEach(function(item){
-            //             item.remove();
-            //          });
-            //     }catch{
-            //         console.log('nothing to remove')
-            //     }
-
+                try{
+                     document.querySelectorAll('.information-formula').forEach(function(item){
+                        item.remove();
+                     });
+                }catch{
+                    console.log('nothing to remove')
+                }
+// ----------------------------------------------------------------------------------------
                
 
-            //     let rec = score.getBoundingClientRect(); 
-            //     console.log(Math.round(rec.x + 0.5) + " - " + Math.round(rec.y + 0.5));
+                let rec = score.getBoundingClientRect(); 
+                console.log(Math.round(rec.x + 0.5) + " - " + Math.round(rec.y + 0.5));
                 
-            //     let div = document.createElement('div');
-            //     div.classList.add('information-formula');
+                let div = document.createElement('div');
+                div.classList.add('information-formula');
 
-            //     let top = Math.round(rec.x - window.scrollX);                
-            //     console.log(top);
-            //     Object.assign(div.style,{top: top + "px",
-            //         left:Math.round(rec.y + 0.5) + "px"});
-            //     score.appendChild(div);
+                let top = Math.round(rec.x - window.scrollX);                
+                console.log(top);
+                Object.assign(div.style,{top: top + "px",
+                    left:Math.round(rec.y + 0.5) + "px"});
+                score.appendChild(div);
 
-            //     // Assign multiple css
-            //     // Object.assign(div.style,{fontsize:"12px",left:"200px",top:"100px"}); 
-            // });
+                // Assign multiple css
+                // Object.assign(div.style,{fontsize:"12px",left:"200px",top:"100px"}); 
+            });
 
-// ----------------------------------------------------------------------------------------
+
 
                         
             //Append the elements to td
@@ -479,51 +422,47 @@ function constructAlignment(res){
 
 
 
+function getPaths(){ 
+    let seq1 = document.querySelector("#seq1").value.toUpperCase();
+    let seq2 = document.querySelector("#seq2").value.toUpperCase();
 
+    var result = []
 
+    function buildStrings(arr, parent, c) {
+        return arr.reduce(function(r, e) {
+            if (e.parent == parent) {
+            var children = buildStrings(arr, e.key, c + e.key + '->')
+            if (!children.length) result.push(c + e.key)
+            r.push(e)
+            }
+            return r;
+        }, [])
+    }
+    buildStrings(allPaths, 'none', '')
+    result = [...new Set(result)]   
 
+    var res = [];
 
-// function getPaths(){ 
-//     let seq1 = document.querySelector("#seq1").value.toUpperCase();
-//     let seq2 = document.querySelector("#seq2").value.toUpperCase();
+    result.forEach(function(item){
+        if(item.endsWith(seq1.length + "-" + seq2.length)){
+            res.push(item);               
+        }
+    });
 
-//     var result = []
+    // get min length
+    var length= 999999;
+    res.forEach(function(item){
+        if(item.split("->").length<length){
+            length = item.split("->").length;
+        }
+    });
 
-//     function buildStrings(arr, parent, c) {
-//         return arr.reduce(function(r, e) {
-//             if (e.parent == parent) {
-//             var children = buildStrings(arr, e.key, c + e.key + '->')
-//             if (!children.length) result.push(c + e.key)
-//             r.push(e)
-//             }
-//             return r;
-//         }, [])
-//     }
-//     buildStrings(allPaths, 'none', '')
-//     result = [...new Set(result)]   
-
-//     var res = [];
-
-//     result.forEach(function(item){
-//         if(item.endsWith(seq1.length + "-" + seq2.length)){
-//             res.push(item);               
-//         }
-//     });
-
-//     // get min length
-//     var length= 999999;
-//     res.forEach(function(item){
-//         if(item.split("->").length<length){
-//             length = item.split("->").length;
-//         }
-//     });
-
-//     res = res.filter(function(item){
-//         return item.split("->").length == length;
-//     });   
+    res = res.filter(function(item){
+        return item.split("->").length == length;
+    });   
     
-//     return res;        
-// }
+    return res;        
+}
 
 
 

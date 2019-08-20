@@ -67,7 +67,11 @@ window.onload = function () {
             createVisalGrid(seq1, seq2, score_mat, distancesTab);
 
             // Get all the best paths
-            let paths = getPaths();
+            let paths = getPaths(score_mat);
+
+
+            return
+
             let results = document.querySelector('#results');
 
             for (let i=0; i<paths.length; i++){
