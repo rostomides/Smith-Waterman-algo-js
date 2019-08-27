@@ -1,0 +1,107 @@
+Routing article : https://hackersandslackers.com/the-art-of-building-flask-routes/
+
+
+#Communicate with sql db: pip install flask-mysqldb
+#Form validation: pip install Flask-WTF (https://wtforms.readthedocs.io/en/stable/validators.html)
+#Hashing passwords: pip install passlib
+
+#middleware: https://medium.com/@devsudhi/how-to-create-a-middleware-in-flask-4e757041a6aa
+
+#secure flask :https://damyanon.net/post/flask-series-security/
+
+
+
+#############################
+#Dynamic routing
+#############################
+@app.route('/puppy/<name>')
+def puppy(name):
+    return '<h1> This is a page for {} </h1>'.format(name)
+	
+
+#############################
+#Render template
+#############################
+	from flask import Flask, render_template
+	
+	@app.route('/')
+	def index():
+	return render_template('home.html')
+	
+
+
+
+#############################
+#Get current URL
+#############################
+
+	from flask import Flask, request
+	
+	@app.route('/foo')
+	def index():
+		return request.base_url
+		
+		
+#############################
+# Redirect to a url
+#############################
+
+	from flask import Flask, redirect, url_for
+	app = Flask(__name__)
+
+	@app.route("/login")
+	def login():
+		return redirect(url_for('dashboard'))
+	
+
+#############################
+# Add a url to a link
+#############################
+	@app.route('/upload-image')
+	def upload_image():
+		return render_template("upload_img.html")
+
+	in the html:
+
+	<a href="{{url_for('upload_image')}}">upload image</a>
+	
+	
+
+#############################
+# Check file size using cookie
+#############################
+	
+	
+	HTML: 
+	<input type="file" name="file" id="file" oninput="getFileSize(this);">
+	
+	JS:
+	function getFileSize(elm) {
+		// console.log("the size of the file is : " + elm.files[0].size)
+		// this will send a cookie upon form submission
+		document.cookie = "filesize=" + elm.files[0].size
+	}
+	
+	Flask:
+	
+	#Define a variable for max size picture: the file size comes from a cookie that w send with the request 
+	#Cookie is generated using javascript
+	app.config['MAX_SIZE_FILE'] = 5 * 1000 #Kb
+	def allowed_file_size(cookie_size):
+		if int(cookie_size) > app.config['MAX_SIZE_FILE']:
+			return False
+		return True
+	
+	@app.route('/upload-file', methods=["GET", "POST"])
+	def upload_file():
+		
+		if request.method == "POST":
+			errors = []
+
+			#Check the size of the file
+			if not allowed_file_size(request.cookies.get('filesize')):
+				errors.append("The size of the file is too big!") 
+			...
+	
+	
+	

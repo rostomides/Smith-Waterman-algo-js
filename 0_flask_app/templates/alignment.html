@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="../static/css_alignement/bootstrap.min.css" />
+    <link rel="stylesheet" href="../static/css_alignement/style.css" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Smith-Waterman alignment algorithm (work in progress)</h1>
+
+      <div class="row">
+        <div class="col-sm-6" id="penalty-global">
+          <h6 class="text-center">Set Global Penalties</h6>
+          <div class="form-group">
+            <label for="">Match Score</label>
+            <input
+              type="number"
+              class="form-control"
+              value="1"
+              id="match-score"
+            />
+          </div>
+          <div class="form-group">
+            <label for="">Mismatch Score</label>
+            <input
+              type="number"
+              class="form-control"
+              value="1"
+              id="mismatch-score"
+            />
+          </div>
+          <div class="form-group">
+            <label for="">Gap Score</label>
+            <input
+              type="number"
+              class="form-control"
+              value="1"
+              id="gap-score"
+            />
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <h6 class="text-center">Set Detailed Penalties</h6>
+          <table id="penalty-table"></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="form-group">
+        <label for="seq1">Sequence 1 </label>
+        <input type="text" class="form-control" id="seq1" value="ACGGT" />
+      </div>
+
+      <div class="form-group">
+        <label for="seq2">Sequence 2</label>
+        <input class="form-control" type="text" id="seq2" value="GCCGGTG" />
+      </div>
+
+      <button id="alignButton" class="btn btn-success">Get Alignment</button>
+      <button id="newAlignButton" class="btn btn-warning">New Alignment</button>
+    </div>
+    <br />
+
+    <div class="container">
+      <p id="errors"></p>
+    </div>
+
+    <div class="container">
+      <table id="distance-table"></table>
+    </div>
+
+    <div class="container" id="results"></div>
+
+    <!-- <script src="js/jquery-3.4.1.min.js"></script> -->
+    <!-- <script src="js/bootstrap.min.js"></script> -->
+    <script src="../static/js_alignement/functions.js"></script>
+    <script src="../static/js_alignement/app.js"></script>
+  </body>
+</html>
